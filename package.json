@@ -6,7 +6,8 @@
 		"build": "vite build",
 		"serve": "vite preview",
 		"lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,css,less,scss,vue,html,md}\"",
-		"lint:eslint": "eslint \"{src,mock}/**/*.{vue,ts,tsx}\" --fix"
+		"lint:eslint": "eslint \"{src,mock}/**/*.{vue,ts,tsx}\" --fix",
+		"push": "yarn build && scp -r dist/* ubuntu@146.56.251.74:/www/wwwroot/admin.mboke.top"
 	},
 	"dependencies": {
 		"@codemirror/lang-javascript": "^6.0.1",
