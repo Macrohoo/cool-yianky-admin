@@ -6,7 +6,7 @@ export const proxy = {
 	},
 
 	"/prod": {
-		target: "http://mboke.top",
+		target: "https://mboke.top",
 		changeOrigin: true,
 		rewrite: (path: string) => path.replace(/^\/prod/, "/api")
 	}

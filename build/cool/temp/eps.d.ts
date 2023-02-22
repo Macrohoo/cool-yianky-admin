@@ -510,6 +510,81 @@ declare namespace Eps {
 		 */
 		[key: string]: any;
 	}
+
+	interface UserEntity {
+		/**
+		 * ID
+		 */
+		id?: number;
+		/**
+		 * 邮箱
+		 */
+		email?: string;
+		/**
+		 * 手机号
+		 */
+		mobile_phone?: string;
+		/**
+		 * 密码
+		 */
+		password?: string;
+		/**
+		 * 微信unionid
+		 */
+		unionid?: string;
+		/**
+		 * 微信openid
+		 */
+		openid?: string;
+		/**
+		 * 微信session_key
+		 */
+		session_key?: string;
+		/**
+		 * 姓名
+		 */
+		name?: string;
+		/**
+		 * 昵称
+		 */
+		nickname?: string;
+		/**
+		 * 头像
+		 */
+		avatar?: string;
+		/**
+		 * 0普通用户1天卡2周卡3月卡4年卡5永久
+		 */
+		chatgpt_type?: enum;
+		/**
+		 * chatgpt会员开始日期
+		 */
+		chatgpt_vip_create_time?: BigInt;
+		/**
+		 * 0男1女
+		 */
+		sex?: enum;
+		/**
+		 * 用户状态： 0:禁用, 1:启用, 2:删除(隐藏)
+		 */
+		status?: enum;
+		/**
+		 * 备注
+		 */
+		remark?: string;
+		/**
+		 * 创建时间
+		 */
+		createTime?: Date;
+		/**
+		 * 更新时间
+		 */
+		updateTime?: Date;
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
 	interface ChatMessage {
 		/**
 		 * list
@@ -1543,6 +1618,65 @@ declare namespace Eps {
 		};
 	}
 
+	interface YiankyChatgpt {
+		/**
+		 * upgradeVip
+		 */
+		upgradeVip(data?: any): Promise<any>;
+		/**
+		 * 删除
+		 */
+		delete(data?: any): Promise<any>;
+		/**
+		 * 修改
+		 */
+		update(data?: any): Promise<any>;
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<UserEntity>;
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<UserEntity[]>;
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<{
+			pagination: { size: number; page: number; total: number };
+			list: UserEntity[];
+			[key: string]: any;
+		}>;
+		/**
+		 * 新增
+		 */
+		add(data?: any): Promise<any>;
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			upgradeVip: string;
+			delete: string;
+			update: string;
+			info: string;
+			list: string;
+			page: string;
+			add: string;
+		};
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			upgradeVip: boolean;
+			delete: boolean;
+			update: boolean;
+			info: boolean;
+			list: boolean;
+			page: boolean;
+			add: boolean;
+		};
+	}
+
 	type Service = {
 		request(options: {
 			url: string;
@@ -1570,5 +1704,6 @@ declare namespace Eps {
 		dict: { info: DictInfo; type: DictType };
 		space: { info: SpaceInfo; type: SpaceType };
 		task: { info: TaskInfo };
+		yianky: { chatgpt: YiankyChatgpt };
 	};
 }
