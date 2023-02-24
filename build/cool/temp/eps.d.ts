@@ -585,6 +585,33 @@ declare namespace Eps {
 		 */
 		[key: string]: any;
 	}
+
+	interface GptpoolEntity {
+		/**
+		 * ID
+		 */
+		id?: number;
+		/**
+		 * gpt账号key
+		 */
+		api_key?: string;
+		/**
+		 * 伪造ip地址
+		 */
+		ip?: string;
+		/**
+		 * 创建时间
+		 */
+		createTime?: Date;
+		/**
+		 * 更新时间
+		 */
+		updateTime?: Date;
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
 	interface ChatMessage {
 		/**
 		 * list
@@ -1677,6 +1704,59 @@ declare namespace Eps {
 		};
 	}
 
+	interface YiankyGptpool {
+		/**
+		 * 删除
+		 */
+		delete(data?: any): Promise<any>;
+		/**
+		 * 修改
+		 */
+		update(data?: any): Promise<any>;
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<GptpoolEntity>;
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<GptpoolEntity[]>;
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<{
+			pagination: { size: number; page: number; total: number };
+			list: GptpoolEntity[];
+			[key: string]: any;
+		}>;
+		/**
+		 * 新增
+		 */
+		add(data?: any): Promise<any>;
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			delete: string;
+			update: string;
+			info: string;
+			list: string;
+			page: string;
+			add: string;
+		};
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			delete: boolean;
+			update: boolean;
+			info: boolean;
+			list: boolean;
+			page: boolean;
+			add: boolean;
+		};
+	}
+
 	type Service = {
 		request(options: {
 			url: string;
@@ -1704,6 +1784,6 @@ declare namespace Eps {
 		dict: { info: DictInfo; type: DictType };
 		space: { info: SpaceInfo; type: SpaceType };
 		task: { info: TaskInfo };
-		yianky: { chatgpt: YiankyChatgpt };
+		yianky: { chatgpt: YiankyChatgpt; gptpool: YiankyGptpool };
 	};
 }
