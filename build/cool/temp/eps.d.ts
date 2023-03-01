@@ -525,6 +525,14 @@ declare namespace Eps {
 		 */
 		mobile_phone?: string;
 		/**
+		 * 引流key
+		 */
+		refer_key?: string;
+		/**
+		 * 被id用户引流而来
+		 */
+		refered_id?: number;
+		/**
 		 * 密码
 		 */
 		password?: string;
@@ -1651,6 +1659,10 @@ declare namespace Eps {
 		 */
 		upgradeVip(data?: any): Promise<any>;
 		/**
+		 * referUser
+		 */
+		referUser(data?: any): Promise<any>;
+		/**
 		 * 删除
 		 */
 		delete(data?: any): Promise<any>;
@@ -1683,6 +1695,7 @@ declare namespace Eps {
 		 */
 		permission: {
 			upgradeVip: string;
+			referUser: string;
 			delete: string;
 			update: string;
 			info: string;
@@ -1695,6 +1708,7 @@ declare namespace Eps {
 		 */
 		_permission: {
 			upgradeVip: boolean;
+			referUser: boolean;
 			delete: boolean;
 			update: boolean;
 			info: boolean;
@@ -1757,6 +1771,65 @@ declare namespace Eps {
 		};
 	}
 
+	interface ReferRelation {
+		/**
+		 * addRedeemed
+		 */
+		addRedeemed(data?: any): Promise<any>;
+		/**
+		 * redeemed
+		 */
+		redeemed(data?: any): Promise<any>;
+		/**
+		 * list
+		 */
+		list(data?: any): Promise<any[]>;
+		/**
+		 * page
+		 */
+		page(data?: any): Promise<{
+			pagination: { size: number; page: number; total: number };
+			list: any[];
+			[key: string]: any;
+		}>;
+		/**
+		 * info
+		 */
+		info(data?: any): Promise<any>;
+		/**
+		 * update
+		 */
+		update(data?: any): Promise<any>;
+		/**
+		 * delete
+		 */
+		delete(data?: any): Promise<any>;
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			addRedeemed: string;
+			redeemed: string;
+			list: string;
+			page: string;
+			info: string;
+			update: string;
+			delete: string;
+		};
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			addRedeemed: boolean;
+			redeemed: boolean;
+			list: boolean;
+			page: boolean;
+			info: boolean;
+			update: boolean;
+			delete: boolean;
+		};
+	}
+
 	type Service = {
 		request(options: {
 			url: string;
@@ -1785,5 +1858,6 @@ declare namespace Eps {
 		space: { info: SpaceInfo; type: SpaceType };
 		task: { info: TaskInfo };
 		yianky: { chatgpt: YiankyChatgpt; gptpool: YiankyGptpool };
+		referRelation: ReferRelation;
 	};
 }

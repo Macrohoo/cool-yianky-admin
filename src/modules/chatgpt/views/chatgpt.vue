@@ -23,15 +23,28 @@
     <cl-upsert ref="Upsert">
     </cl-upsert>
 
-    <cl-form ref="Form"></cl-form>
+    <cl-form ref="Form">
+      <template #slot-refer="{ scope }">
+        <el-table :data="scope.append" style="width: 100%" height="350">
+          <el-table-column fixed prop="nickname" label="昵称" width="80" />
+          <el-table-column prop="mobile_phone" label="手机号" width="120" />
+          <el-table-column prop="chatgpt_type_cn" label="购买类型" width="80" />
+          <el-table-column prop="chatgpt_vip_create_time" label="购买时间" />
+        </el-table>
+      </template>
+    </cl-form>
   </cl-crud>
 </template>
 
 <script lang="tsx" setup name="crud">
 import { useCrud, useUpsert, useTable, useForm } from "@cool-vue/crud";
 import { service } from "/@/cool";
-import { proxy } from "/@/cool";
 import utils from '../../../utils/index'
+
+import { getCurrentInstance } from 'vue'
+import { ElMessageBox, ElMessage } from 'element-plus'
+const { appContext } = getCurrentInstance()!
+
 
 const Form = useForm();
 
@@ -43,7 +56,6 @@ const Crud = useCrud(
     app.refresh();
   }
 );
-
 
 //这里包含定制按钮
 const Table = useTable({
@@ -66,6 +78,13 @@ const Table = useTable({
     {
       label: "邮箱",
       prop: "email"
+    },
+    {
+      label: "是否受邀",
+      prop: "refered_id",
+      formatter(row) {
+        return row.refered_id ? '受邀注册' : '自由注册'
+      }
     },
     {
       label: "VIP类型",
@@ -108,7 +127,7 @@ const Table = useTable({
     },
     {
       type: "op",
-      width: 250,
+      width: 350,
       buttons: [
         "info",
         {
@@ -187,7 +206,7 @@ const Table = useTable({
                   delete data.chatgpt_type
                   //请求升级vip接口
                   service.request({
-                    url: (isDev ? '' : '/api') + '/admin/yianky/chatgpt/upgrade-vip',
+                    url: '/admin/yianky/chatgpt/upgrade-vip',
                     method: "POST",
                     data: data
                   }).then(res => {
@@ -198,6 +217,113 @@ const Table = useTable({
                 }
               }
             });
+          }
+        },
+        {
+          label: "分销详情",
+          type: "success",
+          onClick({ scope }) {
+            console.log('scope______', scope)
+            service.request({
+              url: '/admin/yianky/chatgpt/refer-user',
+              method: "POST",
+              data: {
+                id: scope.row.id
+              }
+            }).then(res => {
+              console.log('res___________', res)
+              scope.row.amount = String(res.referamount) + '元'
+              scope.row.append = res.referUser.reduce((combined: any, currentVal: any) => {
+                if (currentVal.chatgpt_type == 1) {
+                  currentVal.chatgpt_type_cn = '日卡'
+                }
+                if (currentVal.chatgpt_type == 2) {
+                  currentVal.chatgpt_type_cn = '周卡'
+                }
+                if (currentVal.chatgpt_type == 3) {
+                  currentVal.chatgpt_type_cn = '月卡'
+                }
+                if (currentVal.chatgpt_type == 4) {
+                  currentVal.chatgpt_type_cn = '年卡'
+                }
+                if (currentVal.chatgpt_type == 5) {
+                  currentVal.chatgpt_type_cn = '永久卡'
+                }
+                currentVal.chatgpt_vip_create_time = utils.unixDate(currentVal.chatgpt_vip_create_time / 1000)
+                combined.push(currentVal)
+                return combined
+              }, [])
+              Form.value?.open({
+                op: {
+                  saveButtonText: '兑换'
+                },
+                title: "分销详情",
+                items: [
+                  {
+                    label: "分销名单",
+                    prop: 'append',    //如果component使用vm的写法，props也要写成append
+                    value: scope.row.append,
+                    component: {
+                      name: "slot-refer"
+                    }
+                  },
+                  {
+                    label: "可兑换金额",
+                    prop: 'amount',
+                    value: scope.row.amount,
+                    required: true,
+                    component: {
+                      name: "el-input",
+                      props: {
+                        disabled: true
+                      }
+                    }
+                  }
+                ],
+                on: {
+                  submit(data, { close, done }) {
+                    ElMessageBox.confirm(
+                      '确定后将兑换掉上面的所有分销数据',
+                      '注意❗️提醒❗️',
+                      {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning',
+                        draggable: true,
+                      }
+                    )
+                      .then(() => {
+                        ElMessage({
+                          type: 'success',
+                          message: '兑换提交',
+                        })
+                        let postData = {} as any
+                        postData.superior = scope.row.id
+                        postData.userIds = data.append.reduce((combied: any, currentVal: any) => {
+                          combied.push(currentVal.id)
+                          return combied
+                        }, [])
+                        //兑换分销（此次提交为止可见的数据）提交
+                        service.request({
+                          url: '/admin/refer-relation/add-redeemed',
+                          method: "POST",
+                          data: postData
+                        }).then(res => {
+                          console.log('Crud', Crud)
+                          close()
+                          Crud.value?.refresh()
+                        })
+                      })
+                      .catch(() => {
+                        ElMessage({
+                          type: 'info',
+                          message: '兑换取消',
+                        })
+                      })
+                  }
+                }
+              })
+            })
           }
         }
       ]
